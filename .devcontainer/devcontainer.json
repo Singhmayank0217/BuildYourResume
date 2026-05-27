@@ -1,0 +1,31 @@
+{
+  "name": "smart-resume-builder",
+  "dockerComposeFile": [
+    "backend/docker-compose.full.yml"
+  ],
+  "service": "api",
+  "workspaceFolder": "/workspaces/smart-resume-builder/backend",
+  "forwardPorts": [8000, 5432, 5555],
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+  "remoteUser": "root",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.testing.pytestEnabled": true,
+        "python.testing.unittestEnabled": false,
+        "python.testing.pytestArgs": ["tests"]
+      }
+    }
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20"
+    }
+  }
+}

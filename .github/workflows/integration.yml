@@ -1,0 +1,53 @@
+name: Integration Tests
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: smart
+          POSTGRES_PASSWORD: smart
+          POSTGRES_DB: smart_resume
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U smart -d smart_resume"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+      - name: Install dependencies
+        run: |
+          cd backend
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+      - name: Run migrations
+        env:
+          DATABASE_URL: postgresql://smart:smart@localhost:5432/smart_resume
+        run: |
+          cd backend
+          alembic upgrade head || true
+      - name: Run tests
+        env:
+          DATABASE_URL: postgresql://smart:smart@localhost:5432/smart_resume
+          REDIS_URL: redis://localhost:6379/0
+          CELERY_BROKER_URL: redis://localhost:6379/0
+        run: |
+          cd backend
+          pytest -q
