@@ -8,6 +8,8 @@ on:
 jobs:
   integration:
     runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}/backend
     services:
       postgres:
         image: postgres:16-alpine
